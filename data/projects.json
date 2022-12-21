@@ -1,10 +1,9 @@
 [
   {
     "page": "lobster40",
-    "title": "Custom 40% Keyboard",
+    "name": "Custom 40% Keyboard",
     "description": "A custom 40% PCB with a display in the middle!",
-    "images": [],
+    "preview_image": "https://media.twitch.dance/lobster40.jpg",
     "markdown": "pages/projects/lobster40"
   }
-
 ]

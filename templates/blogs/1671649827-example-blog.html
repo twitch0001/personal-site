@@ -1,0 +1,20 @@
+{% extends "page.html" %}
+
+{% block content %}
+<h2>Welcome to my blog</h2>
+<small>{{blog.pretty_time}}</small>
+
+<p>Welcome to my blog! I'll write about random crap on here.</p>
+<p>Mostly about: programming, keyboards, and trains.</p>
+
+<h3>Making a blog...</h3>
+<p>How would you go about making a blog? Using Jekyll? Hugo? Ghost? They're all good options and have their different pros and cons, but I thought I'd make my own simple solution with Flask.</p>
+<p>As you will very often find in my projects, I like reinventing the wheel. Sometimes it isn't efficient to do that, and of course in those cases I'll let more experienced people make things.
+Such as with a quick experiment with <a href="https://en.wikipedia.org/wiki/Multicast_DNS">MDNS</a> on the Pico, there was already a project out there that implemented MDNS for micropython, and while it was bugged, there was no reason to reinvent the wheel.
+</p>
+
+<h5>Blog structure:</h5>
+<p>It's quite simple really, just a basic Flask application with JSON data files storing projects and blogs, with Jinja templates for the pages and their content</p>
+<p>I may open-source it at some point but it is something that can be easily recreated with 30 minutes and the Flask documentation</p>
+
+{% endblock %}

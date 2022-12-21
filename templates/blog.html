@@ -1,0 +1,14 @@
+{% extends "page.html" %}
+
+
+{% block content %}
+<ul>
+    {%- for blog in blogs -%}
+        <li>
+            <a href="blog/{{ blog.page }}">[{{blog.pretty_time}}]: {{ blog.name }}</a>
+        </li>
+    {%- endfor -%}
+
+</ul>
+
+{% endblock %}

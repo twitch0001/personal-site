@@ -3,7 +3,6 @@ import sys
 from flask import Flask, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-
 app = Flask(__name__)
 
 if sys.platform != "win32":

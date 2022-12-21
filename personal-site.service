@@ -1,0 +1,13 @@
+[Unit]
+AssertPathExists=/home/twitch/projects/personal-site
+
+[Service]
+WorkingDirectory=/home/twitch/projects/personal-site
+StandardOutput=journal+console
+ExecStart=/home/twitch/projects/personal-site/venv/bin/gunicorn app:app
+Restart=on-failure
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

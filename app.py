@@ -23,4 +23,4 @@ def blog_page():
 
 @app.route("/projects")
 def projects_page():
-    return render_template("page.html")
+    return render_template("projects.html")

@@ -1,11 +1,9 @@
 import sys
 import json
 import pathlib
-import markdown
 from dataclasses import dataclass
 
 from flask import Flask, render_template
-from markupsafe import Markup
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)

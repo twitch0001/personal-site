@@ -1,9 +1,11 @@
 import sys
 import json
 import pathlib
+import markdown
 from dataclasses import dataclass
 
 from flask import Flask, render_template
+from markupsafe import Markup
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
@@ -20,7 +22,6 @@ class Project:
     name: str
     description: str
     preview_image: str
-    markdown: str  # pages/projects/*.md
 
 
 with open("data/projects.json", "rb") as f:
@@ -48,5 +49,8 @@ def projects_page():
 
 @app.route("/projects/<page>")
 def project_view(page: str):
-    return render_template("notready.html", page=page)
+    project = projects.get(page)
+    if project is None:
+        return render_template("404.html")
+    return render_template(f"projects/lobster40.html")
 

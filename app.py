@@ -58,6 +58,11 @@ def home_page():
     return render_template("home.html")
 
 
+@app.route("/socials")
+def socials_page():
+    return render_template("socials.html")
+
+
 @app.route("/blog")
 def blog_page():
     return render_template("blog.html", blogs=list(blogs.values()))

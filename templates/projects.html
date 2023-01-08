@@ -8,7 +8,10 @@
         <li>
             <a href="projects/{{ project.page }}">{{ project.name }} - {{project.description}}</a>
         </li>
-        <img src="{{project.preview_image}}" height="400" width="300"/>
+
+        {% if project.preview_image %}
+            <img src="{{project.preview_image}}" height="400" width="300" alt="Preview of {{project.name}}"/>
+        {% endif %}
     {%- endfor -%}
 
 </ul>

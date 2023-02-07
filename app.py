@@ -65,7 +65,7 @@ def socials_page():
 
 @app.route("/blog")
 def blog_page():
-    return render_template("blog.html", blogs=list(blogs.values()))
+    return render_template("blog.html", blogs=reversed(list(blogs.values())))
 
 
 @app.route("/projects")

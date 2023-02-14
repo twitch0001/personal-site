@@ -1,0 +1,46 @@
+{% extends "page.html" %}
+
+{% block content %}
+
+    <div id="top">
+        <div>
+            <h2 style="margin-bottom: 5px">Making an ADHD compatible organizer...</h2>
+            <small style="margin-top: auto">{{blog.pretty_time}}</small>
+        </div>
+        <h3>Still being written...</h3>
+    </div>
+
+
+    <ul>
+        <li><a href="#introduction">why?</a></li>
+        <li><a href="#requirements">requirements.</a></li>
+    </ul>
+
+
+    <div id="introduction">
+        <a id="introduction"><h3>Why?</h3></a>
+        <p>
+            I hear you ask: "gabi, why do you need a custom organizer?". Well it's a little complicated and I hope I'm not the only one out there that has struggled to find a program that encapsulates their needs.
+            Over the years I have tried several systems for organizing my work, ideas, and anything else that would require <i>memory</i>.
+        </p>
+
+
+        <div id="#why-alevels">
+            <h4>A-Levels:</h4>
+            <p>
+                Trello with a Google Calendar plugin is what I used for my A-Levels. Organization went as follows: my Schedule was assigned on Google Calendar (with appropriate notifications for deadlines), Tasks that needed to be done were added to Trello,
+                and at the end of every week I would try to reflect on what I had done for the week and move things around based on due date. However, as i'm sure some may understand, so much of this required me to check Trello, opening a new tab (often leading to distraction and completely forgetting about what i was doing), which simply isn't good for a program meant to organize School work.
+            </p>
+        </div>
+    </div>
+
+    <div id="requirements">
+        <a id="requirements"><h3>Requirements:</h3></a>
+        <p>Every time i thought of what i'd love in an organization program the ideas and requirements piled up, causing a pretty typical ADHD cycle of (idea -> start -> never finish -> forget -> repeat).</p>
+        <p>Getting started is always hard, so the starting requirements were kept simple:</p>
+        <ul>
+            <li>Simple desktop app with shortcuts</li>
+            <li>An API for syncing between multiple devices</li>
+        </ul>
+    </div>
+{% endblock %}

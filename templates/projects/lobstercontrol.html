@@ -1,22 +1,53 @@
 {% extends "page.html" %}
 
 {% block content %}
-<h2>Lobster Control!</h2>
-<h3>will write this out one day...</h3>
 
-<p>Control program for <a href="/projects/lobster40">Lobster40</a></p>
+    <div>
+        <h2>Lobster Control - Control Software for the <a href="/projects/lobster40">Lobster40</a> Keyboard!</h2>
+    </div>
+
+    <ul>
+        <li><a href="#what">what is it?</a></li>
+        <li><a href="#how">how did you make it</a></li>
+        <li><a href="#images">images</a></li>
+        <li><a href="#credits">credits</a></li>
+    </ul>
+
+    <div id="what">
+        <h3>What is Lobster Control?</h3>
+        <p>Lobster control is a Desktop program written in Python (with Pyside6) which allows you to control the features available on the Lobster40 Keyboard, such as displaying now playing songs on the display, and in the future, managing programmable buttons and linking those with my Pandora Organizer project.</p>
+    </div>
+
+    <div id="how">
+        <h4>Interface</h4>
+        <p>The Interface was made with Pyside6 and i designed the layout using QtDesigner (far easier than programming it imo)</p>
+
+        <h4>Communication with Keybontard</h4>
+        <p></p>
+
+        <h4>Now playing status</h4>
+    </div>
+
+    <div id="images" style="display: grid; grid-template-columns: auto;">
+        <a>Images:</a>
+        <figure>
+            <img src="https://media.twitch.dance/LobsterControl_KeebDisplay.png" width="30%" alt="A keyboard connected to Lobster Control, with the display showing Be Sweet By Japanese Breakfast."/>
+            <figcaption>Syncing with Spotify via Windows Media API</figcaption>
+        </figure>
 
 
-<figure>
-    <img src="https://media.twitch.dance/LobsterControl_KeebDisplay.png" width="30%" alt="A keyboard connected to Lobster Control, with the display showing Be Sweet By Japanese Breakfast."/>
-    <figcaption>Syncing with Spotify via Windows Media API</figcaption>
-</figure>
+        <figure>
+            <img src="https://media.twitch.dance/LobsterControl_Nokeeb.png" width="30%" alt="No Keyboard Connected to Lobster Control"/>
+            <figcaption>When no keyboard is found...</figcaption>
+        </figure>
+    </div>
+
+    <div id="credits">
+        <p>A massive hug and shoutout to the wonderful people in the QMK Discord Server!</p>
+    </div>
 
 
-<figure>
-    <img src="https://media.twitch.dance/LobsterControl_Nokeeb.png" width="30%" alt="No Keyboard Connected to Lobster Control"/>
-    <figcaption>When no keyboard is found...</figcaption>
-</figure>
+
 
 
 {% endblock %}

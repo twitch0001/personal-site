@@ -20,12 +20,91 @@
 
     <div id="how">
         <h4>Interface</h4>
-        <p>The Interface was made with Pyside6 and i designed the layout using QtDesigner (far easier than programming it imo)</p>
+        <p>The Interface was made with Pyside6 and I designed the layout using Qt Designer (far easier than programming it imo)</p>
 
-        <h4>Communication with Keybontard</h4>
+        <h4>Communication with Keyboard</h4>
         <p></p>
 
-        <h4>Now playing status</h4>
+
+        <div id="how-np">
+            <h4>Now playing status</h4>
+            <p>In order to display the currently playing song we need to use some sort of API. Initially I used the last.fm API for a proof of concept as this is an API i have lots of experience with.
+                However, calling an API every 2 seconds is not ideal, and isn't fair on the owners of the site, so I had to come up with another method.
+                As I primarily use Windows, using the Windows Media API was a great option to go for.
+            </p>
+
+            <p>I came across a super useful <a href="https://stackoverflow.com/a/66037406/11031022">stackoverflow post</a> which told me not only how to get the track data, but the thumbnail too (which we use later on)</p>
+            <pre>
+                <code class="python">
+# >>> Runs in the Sync Thread
+sessions: MediaManager = asyncio.run(self.manager_request_async())
+
+current_session: Optional[MediaControlsSession] = None
+for s in sessions.get_sessions():
+    app_name = s.source_app_user_model_id
+    if APPROVED_PATTERN.search(app_name.removesuffix(".exe").lower()):
+        current_session = s
+
+if not current_session:
+    self.pipe.sync_details.emit(False, None)
+    time.sleep(2)
+    continue
+
+
+session_application = current_session.source_app_user_model_id  # Application Title
+if not APPROVED_PATTERN.search(session_application.removesuffix(".exe").lower()):
+    time.sleep(2)
+    continue
+
+self.pipe.sync_details.emit(True, app_name)
+timeline: SessionTimelineProperties = current_session.get_timeline_properties()  # progress of media
+
+if timeline.end_time.seconds != 0:
+    progress = (timeline.position / timeline.end_time) * 100
+    self.keyboard.send_progress(int(progress))
+
+info: SessionMediaProperties = asyncio.run(self.manager_media_properties(current_session))
+
+if info.title == self.previous_title:
+    time.sleep(2)
+    continue
+
+    self.previous_title = info.title
+
+try:
+    self.keyboard.reset()  # Reset display
+    self.keyboard.send_title(f"{info.title} - {info.artist}")  # Send the current title
+except hid.HIDException:  # Really should be handled by the Keyboard object
+    self.pipe.connection_status.emit(False)
+    return
+                </code>
+            </pre>
+
+
+            <a>Displaying the album art on the keyboard</a>
+            <p>Image converted with [link to qmk pillow formatter here]</p>
+            <pre>
+                <code class="python">async def read_stream_into_buffer(reference, buffer):  # fuckery to make this work inside of a thread
+    stream = await reference.open_read_async()
+    await stream.read_async(buffer, buffer.capacity, InputStreamOptions.READ_AHEAD)
+
+
+# >>> In the Control Loop
+# credits to: https://stackoverflow.com/a/66037406/11031022
+thumbnail_buffer = WinBuffer(5000000)
+asyncio.run(self.read_stream_into_buffer(thumbnail_ref, thumbnail_buffer))
+
+in_data = BytesIO()
+in_data.write(bytes(thumbnail_buffer))
+in_data.seek(0)
+
+out_data = BytesIO()
+image = Image.open(in_data)
+image = image.resize((100, 100))
+image.save(out_data, "QGF", qmk_format=QGF_FORMAT)  # Convert image to QGF, using QMK's Pillow Formatter
+                </code>
+            </pre>
+        </div>
     </div>
 
     <div id="images" style="display: grid; grid-template-columns: auto;">

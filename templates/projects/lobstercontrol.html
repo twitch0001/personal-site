@@ -28,12 +28,14 @@
 
         <div id="how-np">
             <h4>Now playing status</h4>
-            <p>In order to display the currently playing song we need to use some sort of API. Initially I used the last.fm API for a proof of concept as this is an API i have lots of experience with.
+            <p>In order to display the currently playing song we need to use some sort of API. Initially I used the Last.FM API for a proof of concept as I've used Last.FM extensively in the past.
                 However, calling an API every 2 seconds is not ideal, and isn't fair on the owners of the site, so I had to come up with another method.
                 As I primarily use Windows, using the Windows Media API was a great option to go for.
             </p>
 
-            <p>I came across a super useful <a href="https://stackoverflow.com/a/66037406/11031022">stackoverflow post</a> which told me not only how to get the track data, but the thumbnail too (which we use later on)</p>
+            <p>I came across a super useful <a href="https://stackoverflow.com/a/66037406/11031022">stackoverflow post</a> which not only told me how to get the track data, but also how to get the thumbnail (which we use later on).
+            The Code below show what Lobster Control uses in the MusicSync Thread to update the title on the keyboard, and to send the current position in the song.
+            </p>
             <pre>
                 <code class="python">
 # >>> Runs in the Sync Thread
@@ -81,8 +83,8 @@ except hid.HIDException:  # Really should be handled by the Keyboard object
             </pre>
 
 
-            <a>Displaying the album art on the keyboard</a>
-            <p>Image converted with [link to qmk pillow formatter here]</p>
+            <h5>Displaying the album art on the keyboard:</h5>
+            <p>Image converted with <a href="https://github.com/qmk/qmk_firmware/blob/b835171008eaeaa992a1b8e390af8bce6f5f0b8f/lib/python/qmk/painter_qgf.py">tzarc's QGF PIllow Converter</a></p>
             <pre>
                 <code class="python">async def read_stream_into_buffer(reference, buffer):  # fuckery to make this work inside of a thread
     stream = await reference.open_read_async()
@@ -104,6 +106,9 @@ image = image.resize((100, 100))
 image.save(out_data, "QGF", qmk_format=QGF_FORMAT)  # Convert image to QGF, using QMK's Pillow Formatter
                 </code>
             </pre>
+            <p>Despite using LVGL for the display in QMK, I've decided to still send QGF over HID as not only does it work, but sending raw data would take too long.
+                I also decided that it would be much easier/make more sense to take the QGF on the keyboard and pipe that into LVGL.
+            </p>
         </div>
     </div>
 

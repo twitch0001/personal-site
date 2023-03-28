@@ -1,0 +1,265 @@
+{% extends "page.html" %}
+
+{% block content %}
+    <div id="top">
+        <div>
+            <h2 style="margin-bottom: 5px">Last.FM - (something meaningful here)</h2>
+            <small>{{blog.pretty_time}}</small>
+        </div>
+    </div>
+
+
+    <h3>Contents:</h3>
+    <ul>
+        <li><a href="#introduction">intro</a></li>
+        <li><a href="#issues">issues</a></li>
+        <li><a href="#improvements">how could it be improved</a></li>
+        <li><a href="#alternatives">alternatives?</a></li>
+        <li><a href="#acknowledgements">acknowledgements</a></li>
+    </ul>
+
+    <div id="introduction">
+        <h2 id="introduction">Intro to Last.FM</h2>
+        <p>
+            Last.FM is a popular music tracking website. It takes data in from several sources to show what music you listen to and give you statistics on your listening habits.
+            It's a great website for those who want to put a number to "enjoying" an artist, or to quantify how much they really enjoy that niche new song, along with recommendations for your listening habits.
+
+            The website used to also include features such as internet radio stations, the ability to listen to music without leaving the platform and the website used to act more like a social media. However, since 2014, a lot of the features that made Last.FM the fun music-based social media have been removed.
+        </p>
+
+        <p>
+            <a href="https://last.fm/user/britneytwitch">I've been using the website since 2018</a> and have tracked most of my listening habits since then. One of the reasons I started using Last.FM was because of its API, and the applications people had created on Discord that uses this API.
+            I knew immediately that I wanted to create silly programs in order to manipulate the extensive data on my listening habits.
+        </p>
+
+        <p>
+            As much as I love the public API Last.FM provides, it does leave a lot to ask for, and is far from perfect. I'm going to discuss what I think is wrong with the API - what I think could be improved (and whether it is sensible for things to change) and any alternatives to Last.FM.
+        </p>
+    </div>
+
+    <hr />
+
+    <div id="issues">
+        <h3 id="issues">The problems with the site.</h3>
+        <p>
+            While we are very lucky to have a public Last.FM API <a href="https://media.twitch.dance/blog/lastfm-rant/paid-apis.png">(especially in 2023)</a>; The Last.FM has issues ranging from inconsistent/bad data structures to returning 200 OK responses for an error...
+        </p>
+
+        <h4>Inconsistent/Bad Data Structure:</h4>
+        <p>Where to start... well, the API originally was designed to only return XML - while XML might have been fine a couple of years ago, it's not as common as JSON. As such, the API is able to return JSON by using the <code>fmt=json</code> query parameter, which is already very odd, but not too rare for public APIs.
+            However, this JSON isn't natively built but rather, just converted from XML which leads to some very interesting and unusual JSON structures - making it particularly difficult to create normalized data structures without extra work (something I'm yet to finish).</p>
+
+        <pre>
+            <code class="javascript">
+{
+   "weeklytrackchart":{
+      "track":[
+         {
+            "artist":{
+               "mbid":"44cf61b8-5197-448a-b82b-cef6ee89fac5",
+               "#text":"Paramore"
+            },
+            "image":[
+               {
+                  "size":"small",
+                  "#text":"https:\/\/lastfm.freetls.fastly.net\/i\/u\/34s\/2a96cbd8b46e442fc41c2b86b821562f.png"
+               },
+               {
+                  "size":"medium",
+                  "#text":"https:\/\/lastfm.freetls.fastly.net\/i\/u\/64s\/2a96cbd8b46e442fc41c2b86b821562f.png"
+               },
+               {
+                  "size":"large",
+                  "#text":"https:\/\/lastfm.freetls.fastly.net\/i\/u\/174s\/2a96cbd8b46e442fc41c2b86b821562f.png"
+               }
+            ],
+            "mbid":"88ec685e-27dd-40bf-9330-3f0ea31a32a3",
+            "url":"https:\/\/www.last.fm\/music\/Paramore\/_\/Thick+Skull",
+            "name":"Thick Skull",
+            "@attr":{
+               "rank":"1"
+            },
+            "playcount":"23"
+         }
+      ]
+   }
+}
+            </code>
+        </pre>
+        <p>As you can see the JSON responses are quite unusual... The variety of data included is mostly adequate (apart from dead image links... or lack thereof in the getWeeklyAlbumChart method.</p>
+        <p>Data like this just isn't fun to create models of in my opinion - along with the fact that it's not consistent throughout the platform, or that some values are sent as strings (when in reality they are ints) makes it pretty frustrating to write programs using the API.</p>
+
+
+        <h4>Overall mess:</h4>
+        <p>There's also the issues with bugs - things such as <b>user.getRecentTracks</b> returning the wrong user's recent scrobbles (which causes a lot of confusion for those using a Discord Bot to view their scrobbles.
+            Another Problem is that there are endpoints that have incomplete/dead data. It's a shame that such a useful API that provides such amazing data has these issues that make it annoying for developers to work with.
+        </p>
+        <i>another annoying issue is that Last.FM doesn't always provide MBIDs for entities or that the MBID is simply wrong sometimes...</i>
+    </div>
+
+    <hr />
+
+    <div id="improvements">
+        <h3 id="improvements">How can it improve?</h3>
+        <p>Well obviously I don't work for Last.FM and my understanding of the API is from what I've either heard or learnt from using it.
+            However, it's fair to say a few things could be improved and here's a few ideas - which I believe is better than just saying "it can be so much better" <i>doesn't elaborate</i>.
+
+
+        </p>
+        <div id="improvements-data">
+            <h4 id="improvements-data">Data Structures</h4>
+            <p>One solution to improving the data structures for those that use JSON is to stop converting the XML into JSON, but rather build JSON from scratch.</p>
+            <p>Data for popular methods like <b>user.getRecentTracks</b> should look something like</p>
+
+            <div id="side-by-side" style="display: flex;">
+                <div style="flex: 0 0 50%;">
+                    <pre>
+                    <code class="javascript">{
+	"recenttracks": {
+		"track": [
+			{
+				"artist": {
+					"mbid": "18a627eb-c6e8-4175-b947-9322d8deb938",
+					"#text": "Deep Sea Diver"
+				},
+				"streamable": "0",
+				"image": [
+					{
+						"size": "small",
+						"#text": "..."
+
+					}
+				],
+				"mbid": "05de569a-2a6c-4bd0-bf83-9919f7863803",
+				"album": {
+					"mbid": "01e84caf-19e4-4c68-b230-58b9fed75620",
+					"#text": "IMPOSSIBLE WEIGHT"
+				},
+				"name": "Lights Out",
+				"@attr": {
+					"nowplaying": "true"
+				},
+				"url": "https:\/\/www.last.fm\/music\/Deep+Sea+Diver\/_\/Lights+Out"
+			},
+		],
+		"@attr": {
+			"user": "BritneyTwitch",
+			"totalPages": "84364",
+			"page": "1",
+			"perPage": "1",
+			"total": "84364"
+
+		}
+}</code>
+                            <i>Current Response (links removed to prevent page issues)</i>
+                        </pre>
+                </div>
+
+                <div style="flex: 1;">
+                    <pre>
+                        <code class="javascript">{
+	"recent_tracks": [
+			{
+				"name": "Lights Out",
+				"url": "https:\/\/www.last.fm\/music\/Deep+Sea+Diver\/_\/Lights+Out",
+				"artist": {
+					"name": "Deep Sea Diver",
+					"mbid": "18a627eb-c6e8-4175-b947-9322d8deb938"
+				},
+				"album": {
+					"name": "IMPOSSIBLE WEIGHT",
+					"mbid": "01e84caf-19e4-4c68-b230-58b9fed75620"
+				},
+
+				"images": [
+					{
+						"size": "small",
+						"url": "..."
+					}
+				]
+
+				"mbid": "05de569a-2a6c-4bd0-bf83-9919f7863803",
+
+				"attr": {
+					"now_playing": false
+				}
+			}
+
+		],
+	"attr": {
+		"user": "BritneyTwitch",
+		"total_pages": 84364,
+		"page": 1,
+		"per_page": 1,
+		"total": 84364
+	}
+}</code>
+                            <i>Ideal response (in my opinion)</i>
+                        </pre>
+                </div>
+            </div>
+
+        </div>
+
+        <p>Removing characters from identifiers that make it hard to build models in languages where those characters are illegal would make the API much easier to work with - along with the removal of all this nesting to get to data - which makes it annoying to just get to the data (moreso when the API doesn't actually return 4xx HTTP codes for errors)
+        </p>
+    </div>
+
+    <hr />
+
+    <div id="alternatives">
+        <h3 id="alternatives">Alternatives to Last.FM</h3>
+
+        <p>
+            So I've said what I dislike about the platform so surely this is all some build-up to an AD for a "superior" website right? No.
+            I've tried to find platforms like Last.FM and there have been a couple.
+        </p>
+
+        <div>
+            <h4>Listenbrainz:</h4>
+            <p>Starting with <a href="https://listenbrainz.org/">listenbrainz</a> by the absolutely amazing team at the Metabrainz Foundation which is a fully open-source alternative to Last.FM with tight integration into the Musicbrainz database.
+                I gave Listenbrainz a go back in mid-2022 and while I did enjoy using a platform with accurate data, a good API and fantastic integration with the best music database available - it had one MAJOR flaw which will become a common point if you ever ask me about Last.FM or Spotify...
+            </p>
+            <p><b>Spotify has no live feed for currently playing songs</b> - Listenbrainz gets around this by scraping the <i><b>/v1/player/currently-playing</b></i> endpoint of the Spotify API.
+                However, this is incredibly limited in part due to the very limited amount of requests Spotify grants to their developers (something I find quite ridiculous), but my opinions on Spotify (despite it being my platform of choice) are quite unprofessional and won't be disused here for the time being.
+            </p>
+            <p>Last.FM gets around all of these issues because they have a special deal with Spotify which grants them access to a live feed (via a webhook I believe) of signed-up users currently playing songs, which is very similar to the websocket that discord uses for its Spotify Rich Presence Activity.
+                I have had a few ideas of how to get around such a limit - by using a mix of limited API calls and apps on users devices to fill in the rest, however, this will always come at the cost of not being as reliable as the Spotify Feed Last.FM gets (even if it does break every other week...)
+            </p>
+
+            <i>I do understand that not everyone uses Spotify. However, a not so insignificant amount of people do and in order to compete with Last.FM you need to be able to cover all sorts of platforms.</i>
+        </div>
+
+        <div>
+            <h4>Wavy.FM</h4>
+            <p><a href="https://wavy.fm">Wavy.fm</a> is/was a fairly clean and modern take on last.fm, linking in with more social features that I had previously mentioned - it tied directly into the Spotify API and to my knowledge was used as the main data source too </p>
+            <p>My limited experience with the platform suggested it was quite simple but definitely has potential. Unfortunately, it seems that the project is dead now and not in the process of being updated (<a href="https://twitter.com/wavyfm/status/1477310174708879362">last update</a>)</p>
+        </div>
+
+        <div>
+            <h5>My own site??</h5>
+            <p>In the future I do plan on making my own listen tracking website - an attempt to create a useful Last.FM alternative because I love re-inventing the wheel...</p>
+        </div>
+    </div>
+
+    <hr />
+
+    <div id="acknowledgements">
+        <h4 id="acknowledgements">Acknowledgements</h4>
+        <p>I firstly need to give a HUGE shoutout to <a href="https://fmbot.xyz">FMBot</a> which is the most popular (and deservedly) Discord bot for interacting with LastFM.
+            It was the motivator for me to start working on my own commands for Last.FM and I have learnt a lot as a result!
+        </p>
+
+        <p>While the API might be all over the place, it would be wrong not to thank the team @ Last.FM for all their hard work - it might be a mess, but it's a mess that we all love using and while the alternative platforms are great there's nothing quite like Last.FM!</p>
+
+        <h4>Further Reading</h4>
+        <p>I've created my own wrapper for the Last.FM API - check it out <a href="https://github.com/twitch0001/lastfm-py">here</a></p>
+        <p>In the future I'm going to write a blog on my attempt at making a Last.FM alternative, and I'll also update this page as I gain even more experience with the API</p>
+    </div>
+
+
+    <h2>Thank you for reading!</h2>
+    <h3>Follow me on Last.FM @ <a href="https://last.fm/user/britneytwitch">BritneyTwitch</a></h3>
+
+
+{% endblock %}

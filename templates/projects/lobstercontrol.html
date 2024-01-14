@@ -106,11 +106,43 @@ image = image.resize((100, 100))
 image.save(out_data, "QGF", qmk_format=QGF_FORMAT)  # Convert image to QGF, using QMK's Pillow Formatter
                 </code>
             </pre>
-            <p>Despite using LVGL for the display in QMK, I've decided to still send QGF over HID as not only does it work, but sending raw data would take too long.
+            <p>Despite using LVGL for the display in QMK, I've decided to still send QGF over HID for "backwards compatability" but as it's much quicker than sending over a format such as PNG to then get converted over on the keyboard.
+                There's simply not enough compute on the RP2040 to do all the QMK jobs and process an <i>entire</i> PNG (trust me I tried).
                 I also decided that it would be much easier/make more sense to take the QGF on the keyboard and pipe that into LVGL.
+
             </p>
+
+
+            <p>On the keyboard side of things it's relatively simple due to the fantastic work of Tzarc. There are probably far better ways of acheiving this result, but it works and doesn't crash unless you try and display bad apple in real time.
+                The code below loads the QGF sent over HID and loads it into qp image - then drawing it on a cover surface thus loading it into a buffer which can be used by lvgl to display it within as a canvas.
+            </p>
+
+            <p>I am far from a good embedded systems programmer. There's a high chance this isn't best practice, but it works well for a project to procrastinate exams with.</p>
         </div>
     </div>
+    <pre>
+                <code class="c">lv_draw_img_dsc_t dsc;
+
+lv_img_dsc_t loaded_image_dsc = {
+    .header.always_zero = 0,
+    .header.w = 100,
+    .header.h = 100,
+    .data_size = 100 * 100 * 16 / 8,
+    .header.cf = LV_IMG_CF_TRUE_COLOR,
+    .data = (uint8_t *)cover_buffer // the QP surface we'll update later
+}; // as we are doing things unusually LVGL needs some information about our image
+
+void display_image(void) {
+    loaded_image = qp_load_image_mem(raw_image_buffer); // loads raw from HID
+    qp_drawimage(cover_surface, 0, 0, loaded_image);
+    qp_flush(cover_surface); // updates the surface
+
+    lv_canvas_draw_img(canvas, 0, 0, &loaded_image_dsc, &dsc); // draws the canvas using the information
+    qp_close_image(loaded_image);
+    qp_flush(cover_surface);
+    memset(raw_image_buffer, 0, 12000); // reset the raw hid buffer (not needed?)
+}</code>
+    </pre>
 
     <div id="images" style="display: grid; grid-template-columns: auto;">
         <a>Images:</a>
@@ -129,9 +161,4 @@ image.save(out_data, "QGF", qmk_format=QGF_FORMAT)  # Convert image to QGF, usin
     <div id="credits">
         <p>A massive hug and shoutout to the wonderful people in the QMK Discord Server!</p>
     </div>
-
-
-
-
-
 {% endblock %}

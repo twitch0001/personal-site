@@ -1,0 +1,80 @@
+{% extends "page.html" %}
+
+{% block nohead %}
+    <title>twitch.dance - Fixing inconsistencies in a dataset</title>
+    <meta property="og:title" content="twitch.dance - Fixing inconsistencies in a dataset" />
+    <meta property="og:url" content="https://twitch.dance/blog/1681699497-fixing-data/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://media.twitch.dance/chickens.gif"/>
+{% endblock %}
+
+
+{% block content %}
+    <div id="top">
+        <div>
+            <h2 style="margin-bottom: 5px">Fixing inconsistent/bad data in a reasonably sized dataset</h2>
+            <h3 style="margin-bottom: 3px">how i overcome silly mistakes...</h3>
+            <small>{{blog.pretty_time}}</small>
+        </div>
+    </div>
+
+
+    <div id="introduction">
+        <h3>Introduction to the dataset</h3>
+        <p>The inconsistent dataset in question is my store of Last.FM data for users who opt-in for leaderboards on a Discord Server.
+        It consists of ~280k tracks, ~160 albums, and 80k artists.
+        </p>
+
+        <p>
+            We must always assume data from Last.FM is unclean, it does make reasonable attempts to collate mislabelled data into one (typically by redirecting artists names to one main page).
+            However, with the plague that is the metadata from Spotify (the source of most track titles and album names) it causes quite the pain when trying to show a user an accurate leaderboard for who listens to what.
+        </p>
+        <i>a far better solution would be to use a system similar to musicbrainz for credits on tracks and albums - such a rework would be quite the endeavour for last.fm but if they're hiring someone to do that I'll take the job ;).</i>
+    </div>
+
+    <div id="problem">
+        <h3>So what's the problem</h3>
+        <p>The structure for this dataset is created in such a way to deduplicate text stored and in a fast and efficient way collate who listens to what.</p>
+        <figure>
+            <img src="https://media.twitch.dance/blog/data-issues/ga-db-diag.png" alt="An Entity Diagram showing the tables for artists, tracks and albums all linked to a users table">
+            <figcaption>Structure of the database</figcaption>
+        </figure>
+
+        <p>When a user has their data updated, it gets <b>COPY</b>'d into the <i>user_x_staging</i> tables which have no indexes for fast inserts.
+        The data is then merged into the live tables, this process uses PSQL Functions in order to return an ID, creating an entity if it doesn't exist.
+        Here's the query that merges up-to-date artist listens from staging to live, and the <b>fetch_artist</b> function.
+        </p>
+        <pre>
+            <code class="sql">
+INSERT INTO user_artists(user_id, artist_id, listens)
+    SELECT DISTINCT ON (LOWER(user_artists_staging.name)) user_artists_staging.user_id,
+        fetch_artist(user_artists_staging.name) AS artist_id, user_artists_staging.listens
+    FROM user_artists_staging
+        WHERE user_artists_staging.user_id = $1
+        GROUP BY user_artists_staging.user_id, name, listens
+    ON CONFLICT(user_id, artist_id) DO UPDATE SET listens = excluded.listens;
+
+
+CREATE OR REPLACE FUNCTION fetch_artist(name VARCHAR)
+    RETURNS SETOF INT AS $$
+        BEGIN
+            RETURN QUERY SELECT id FROM artists WHERE LOWER(artists.name) = LOWER(fetch_artist.name) LIMIT 1;
+            IF NOT FOUND THEN
+                RETURN QUERY INSERT INTO artists (name)
+                    VALUES (fetch_artist.name)
+                    ON CONFLICT DO NOTHING
+                    RETURNING id;
+            end if;
+END; $$ LANGUAGE plpgsql;
+            </code>
+        </pre>
+
+    <p>You'll notice that in the function it selects artists by the <b>LOWER</b> of their name - quite often will artists that have mixed cases in their names have mislabelled data on Last.FM with the wrong case - by fetching regardless of case (and having only the first version be the case) we immediately remove lots of duplicate entries.</p>
+    <i>while writing this i noticed this wasn't the case in the dataset due to the data being quite old - however the links from user <-> artist should be accurate as duplicate names shouldn't be referenced thanks to the function using <b>LOWER</b>. ~0.02% duplicate albums, 0% albums (dataset was rebuilt) and ~0.68% for tracks</i>
+
+    <h3>get on with it!! what's the problem</h3>
+    <p>well for some reason unknown to current me the function for fetching a track based on title and artist name, </p>
+    </div>
+
+
+{% endblock %}

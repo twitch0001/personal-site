@@ -16,5 +16,11 @@
     "name": "Last.FM: a loving rant...",
     "created_at": 1680046904,
     "description": "Last.FM is great but it isn't flawless..."
+  },
+  {
+    "page": "1681699497-fixing-data",
+    "name": "Fixing an inconsistent dataset",
+    "created_at": 1681699497,
+    "description": "How I went about diagnosing and fixing an unclean dataset"
   }
 ]

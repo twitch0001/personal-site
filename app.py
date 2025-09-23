@@ -18,11 +18,18 @@ if sys.platform != "win32":
 
 
 @dataclass
+class Image:
+    url: str
+    height: int
+    width: int
+
+
+@dataclass
 class Project:
     page: str  # url of page
     name: str
     description: str
-    preview_image: str
+    image: Image
 
 
 @dataclass
@@ -43,6 +50,7 @@ with open("data/projects.json", "rb") as f:
     for p in raw_projects:
         p = Project(**p)
         projects[p.page] = p
+        print(p.image)
 
 
 with open("data/blogs.json", "rb") as f:

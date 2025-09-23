@@ -2,15 +2,15 @@
 
 
 {% block content %}
-<h2>here are some of the projects i've worked on!</h2>
+<h2>Here are some of the projects I have worked on/been involved in</h2>
 <ul>
     {%- for project in projects -%}
         <li>
             <a href="projects/{{ project.page }}">{{ project.name }} - {{project.description}}</a>
         </li>
 
-        {% if project.preview_image %}
-            <img src="{{project.preview_image}}" height="400" width="300" alt="Preview of {{project.name}}"/>
+        {% if project.image %}
+            <img src="{{ project.image.url }}" height="{{ project.image.height }}" width="{{ project.image.width }}" alt="Preview of {{ project.name }}"/>
         {% endif %}
     {%- endfor -%}
 

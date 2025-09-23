@@ -3,12 +3,26 @@
     "page": "lobster40",
     "name": "Custom 40% Keyboard",
     "description": "A custom 40% PCB with a display in the middle!",
-    "preview_image": "https://media.twitch.dance/lobster40.jpg"
+    "image": {
+      "url": "https://media.twitch.dance/blog/ortho40-static-small.jpg",
+      "height": 400,
+      "width": 600
+    }
   },
   {
     "page": "lobstercontrol",
     "name": "Keyboard control software",
     "description": "Desktop program to control the display on the lobster40.",
-    "preview_image": null
+    "image": null
+  },
+  {
+    "page": "uwefs",
+    "name": "My time at UWE Formula Student",
+    "description": "",
+    "image": {
+      "url": "https://media.twitch.dance/blog/FSS_endurance_211UWEFS.JPG",
+      "height": 373,
+      "width": 560
+    }
   }
 ]

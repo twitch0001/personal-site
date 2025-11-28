@@ -9,7 +9,7 @@ from flask import Flask, render_template
 # noinspection PyPackageRequirements
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="", static_folder="static/", template_folder="templates")
 
 if sys.platform != "win32":
     app.wsgi_app = ProxyFix(
@@ -50,7 +50,6 @@ with open("data/projects.json", "rb") as f:
     for p in raw_projects:
         p = Project(**p)
         projects[p.page] = p
-        print(p.image)
 
 
 with open("data/blogs.json", "rb") as f:

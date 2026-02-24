@@ -4,7 +4,7 @@
     "name": "Custom 40% Keyboard",
     "description": "A custom 40% PCB with a display in the middle!",
     "image": {
-      "url": "https://media.twitch.dance/blog/ortho40-static-small.jpg",
+      "url": "https://s3.twitch.dance/blog/ortho40-static-small.jpg",
       "height": 400,
       "width": 600
     }
@@ -20,7 +20,7 @@
     "name": "My time at UWE Formula Student",
     "description": "",
     "image": {
-      "url": "https://media.twitch.dance/blog/FSS_endurance_211UWEFS.JPG",
+      "url": "https://s3.twitch.dance/blog/FSS_endurance_211UWEFS.JPG",
       "height": 373,
       "width": 560
     }
